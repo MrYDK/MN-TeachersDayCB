@@ -19,7 +19,7 @@
     background: linear-gradient(135deg, #f9e3f3, #e3f2fd);
     font-family: "Poppins", sans-serif;
     text-align: center;
-    padding-bottom: 50px; /* Add some padding for the 3D model at the bottom */
+
   }
 
   h1 {
@@ -57,14 +57,13 @@
   }
 
   .gallery {
-    margin: 50px auto; /* Centered margin */
+    margin-top: 50px;
     display: flex;
     justify-content: center;
     overflow-x: auto;
     flex-wrap: wrap;
     gap: 15px;
     padding: 10px;
-    max-width: 90%;
   }
 
   .gallery img {
@@ -79,20 +78,6 @@
   .gallery img:hover {
     transform: scale(1.08);
     box-shadow: 0 0 20px rgba(0,0,0,0.25);
-  }
-
-  /* Style for the 3D model container */
-  #model-container {
-    margin: 50px auto 20px auto;
-    width: 90%;
-    max-width: 600px;
-    height: 400px;
-    background-color: #ffffff; /* A clear background for the 3D view */
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
 
   audio {
@@ -110,9 +95,6 @@
     z-index: 999;
   }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/loaders/GLTFLoader.js"></script>
-
 </head>
 <body>
   <canvas id="confetti"></canvas>
@@ -125,10 +107,6 @@
     <img src="photo3.jpg" alt="Sir teaching">
     <img src="photo4.jpg" alt="Students">
   </div>
-  
-  <div id="model-container">
-    <p>Loading 3D Model...</p> 
-  </div>
 
   <audio id="bgMusic" loop>
     <source src="music.mp3" type="audio/mpeg">
@@ -136,11 +114,15 @@
 
   <script>
     const audio = document.getElementById("bgMusic");
+
     document.body.addEventListener("click", function playAudio() {
         audio.play().catch(e => console.log("Audio play prevented:", e));
-        document.body.removeEventListener("click", playAudio);
+    
+    document.body.removeEventListener("click", playAudio);
     });
+  </script>
 
+  <script>
     function createHeart() {
       const heart = document.createElement("div");
       heart.classList.add("heart");
@@ -152,75 +134,7 @@
       setTimeout(() => heart.remove(), 5000);
     }
     setInterval(createHeart, 300);
-  </script>
 
-  <script>
-    const container = document.getElementById('model-container');
-    const WIDTH = container.clientWidth;
-    const HEIGHT = container.clientHeight;
-
-    // 1. Setup Scene, Camera, and Renderer
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, WIDTH / HEIGHT, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(WIDTH, HEIGHT);
-    container.innerHTML = ''; // Clear "Loading..." text
-    container.appendChild(renderer.domElement);
-
-    // 2. Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-    scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(1, 1, 1).normalize();
-    scene.add(directionalLight);
-
-    // 3. Load 3D Model (You MUST have 'model.glb' in the same directory)
-    const loader = new THREE.GLTFLoader();
-    let model; // To store the loaded model for animation
-
-    loader.load(
-      'model.glb', // Replace with your 3D model file (e.g., a trophy, an apple, a book)
-      function (gltf) {
-        model = gltf.scene;
-        // Adjust the model's scale/position if necessary. 
-        // This is highly dependent on your specific model.
-        model.scale.set(10, 10, 10); 
-        scene.add(model);
-        camera.position.z = 5; // Move camera back to see the model
-      },
-      undefined,
-      function (error) {
-        console.error(error);
-        container.innerHTML = '<p style="color: red;">Error loading 3D model! Check console.</p>';
-      }
-    );
-
-    // 4. Animation Loop
-    function animate() {
-      requestAnimationFrame(animate);
-
-      // Rotate the model slightly for visual interest
-      if (model) {
-        model.rotation.y += 0.01;
-      }
-
-      renderer.render(scene, camera);
-    }
-
-    animate();
-
-    // Handle Resize
-    window.addEventListener('resize', () => {
-      const newWidth = container.clientWidth;
-      const newHeight = container.clientHeight;
-      renderer.setSize(newWidth, newHeight);
-      camera.aspect = newWidth / newHeight;
-      camera.updateProjectionMatrix();
-    });
-
-  </script>
-
-  <script>
     const canvas = document.getElementById("confetti");
     const ctx = canvas.getContext("2d");
     let W = canvas.width = window.innerWidth;
